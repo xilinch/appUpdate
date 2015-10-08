@@ -1,0 +1,10 @@
+<resources>
+
+    <color name="black_overlay">#66000000</color>
+    <color name="c_black_000000">#00000000</color>
+    <color name="c_white_ffffff">#FFFFFFFF</color>
+    <color name="c_gray_666666">#666666</color>
+    <color name="c_gray_bebebe">#bebebe</color>
+    <color name="c_blue_288de5">#288de5</color>
+
+</resources>

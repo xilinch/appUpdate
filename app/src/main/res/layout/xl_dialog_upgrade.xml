@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="286dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="286dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="108dp"
+        android:background="@drawable/dd_bg_white_ffffff_5"
+        android:orientation="vertical">
+
+        <!--<TextView-->
+        <!--android:id="@+id/xc_id_dialog_query_title"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="bottom|center_horizontal"-->
+        <!--android:paddingTop="25dp"-->
+        <!--android:visibility="gone"-->
+        <!--android:textColor="@color/c_gray_333333"-->
+        <!--android:textSize="16sp" />-->
+
+        <!--<View-->
+        <!--android:id="@+id/xc_id_dialog_query_title_line"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1dp"-->
+        <!--android:background="@color/c_gray_bebebe"-->
+        <!--android:visibility="gone" />-->
+
+        <TextView
+            android:id="@+id/xc_id_dialog_query_version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|center_vertical"
+            android:paddingBottom="4dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="15dp"
+            android:textColor="@color/c_gray_666666"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/xc_id_dialog_query_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|center_vertical"
+            android:paddingBottom="4dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:textColor="@color/c_gray_666666"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|center_vertical"
+            android:paddingBottom="2dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="更新内容:"
+            android:textColor="@color/c_gray_666666"
+            android:textSize="16sp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:scrollbarStyle="insideInset">
+
+            <TextView
+                android:id="@+id/xc_id_dialog_query_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="top|center_vertical"
+                android:paddingBottom="8dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:textColor="@color/c_gray_666666"
+                android:textSize="16sp" />
+        </ScrollView>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="15dp">
+
+            <LinearLayout
+                android:id="@+id/xc_id_dialog_ll_percent_btns"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <Button
+                    android:id="@+id/xc_id_dialog_query_cancle"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/dd_bg_gray_bebebe_5"
+                    android:textColor="@color/c_white_ffffff"
+                    android:textSize="16sp" />
+
+
+                <Button
+                    android:id="@+id/xc_id_dialog_query_confirm"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/dd_bg_blue_288de5_5"
+                    android:textColor="@color/c_white_ffffff"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <xilinch.cc.org.appupdate.CustomProgressWithPercentView
+                android:visibility="gone"
+                android:id="@+id/xc_id_dialog_fl_percent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp">
+
+            </xilinch.cc.org.appupdate.CustomProgressWithPercentView>
+        </FrameLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ic"
+        android:layout_width="119dp"
+        android:layout_height="136dp"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/d_upgrade_ic" />
+</RelativeLayout>
