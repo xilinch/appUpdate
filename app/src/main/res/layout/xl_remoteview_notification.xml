@@ -21,6 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/c_black_000000"
+            android:text="1111"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:ellipsize="end" />

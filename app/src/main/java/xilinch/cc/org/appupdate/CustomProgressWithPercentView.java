@@ -137,7 +137,7 @@ public class CustomProgressWithPercentView extends FrameLayout {
                         post(updateRunnable);
 
                         try {
-                            sleep(1500 / currentProgress + 1);
+                            sleep(1500 / (currentProgress + 1));
                         } catch (Exception e) {
                             e.printStackTrace();
 
@@ -209,7 +209,7 @@ public class CustomProgressWithPercentView extends FrameLayout {
     private void layoutPercentTextView(int percent) {
         startRepeatAnimationRunnable();
         width = getWidth();
-        System.out.println("width:" + width);
+//        System.out.println("width:" + width);
 
         if (width != 0) {
             if (percent < 50) {
