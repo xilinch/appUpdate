@@ -16,11 +16,11 @@ import android.widget.Toast;
  * @version 1.0
  * @description
  */
-public class MainActivity extends Activity implements View.OnClickListener,UpdateService.DownloadListener{
+public class MainActivity extends Activity implements View.OnClickListener,UpdateUtilsService.DownloadListener{
 
     Button btn1,btn2;
     EditText et;
-    UpdateService updateService;
+    UpdateUtilsService UpdateUtilsService;
     boolean cancel = false;
     public static final String CACHE_DIRECTORY = "qlk";
 
@@ -52,28 +52,28 @@ public class MainActivity extends Activity implements View.OnClickListener,Updat
     public void onClick(View v) {
         String downloadUrl = et.getText().toString();
         String saveFilePath = getSaveFile();
-        updateService = new UpdateService(MainActivity.this);
+        UpdateUtilsService = new UpdateUtilsService(MainActivity.this);
 
         switch (v.getId()){
             case R.id.btn1:
 
-//                Intent intent = new Intent(MainActivity.this,UpdateService.class);
-//                intent.putExtra(UpdateService.S_SIZE, "34M");
-//                intent.putExtra(UpdateService.S_VERSION, "1.2.0");
-//                intent.putExtra(UpdateService.S_CONTENT,"1.增加更多功能;\n2.修复若干bug;\n3.界面优化;");
-//                intent.putExtra(UpdateService.S_CANCEL,true);
-//                intent.putExtra(UpdateService.S_DOWNLOADURL,downloadUrl);
-//                intent.putExtra(UpdateService.S_SAVEFILEPATH, saveFilePath);
+//                Intent intent = new Intent(MainActivity.this,UpdateUtilsService.class);
+//                intent.putExtra(UpdateUtilsService.S_SIZE, "34M");
+//                intent.putExtra(UpdateUtilsService.S_VERSION, "1.2.0");
+//                intent.putExtra(UpdateUtilsService.S_CONTENT,"1.增加更多功能;\n2.修复若干bug;\n3.界面优化;");
+//                intent.putExtra(UpdateUtilsService.S_CANCEL,true);
+//                intent.putExtra(UpdateUtilsService.S_DOWNLOADURL,downloadUrl);
+//                intent.putExtra(UpdateUtilsService.S_SAVEFILEPATH, saveFilePath);
 //                startService(intent);
                 cancel = true;
                 Intent intent = new Intent();
-                intent.putExtra(UpdateService.S_SIZE, "34M");
-                intent.putExtra(UpdateService.S_VERSION, "1.2.0");
-                intent.putExtra(UpdateService.S_CONTENT,"1.增加更多功能;\n2.修复若干bug;\n3.界面优化;");
-                intent.putExtra(UpdateService.S_CANCEL,cancel);
-                intent.putExtra(UpdateService.S_DOWNLOADURL,downloadUrl);
-                intent.putExtra(UpdateService.S_SAVEFILEPATH, saveFilePath);
-                updateService = new UpdateService(MainActivity.this);
+                intent.putExtra(UpdateUtilsService.S_SIZE, "34M");
+                intent.putExtra(UpdateUtilsService.S_VERSION, "1.2.0");
+                intent.putExtra(UpdateUtilsService.S_CONTENT,"1.增加更多功能;\n2.修复若干bug;\n3.界面优化;");
+                intent.putExtra(UpdateUtilsService.S_CANCEL,cancel);
+                intent.putExtra(UpdateUtilsService.S_DOWNLOADURL,downloadUrl);
+                intent.putExtra(UpdateUtilsService.S_SAVEFILEPATH, saveFilePath);
+                UpdateUtilsService = new UpdateUtilsService(MainActivity.this);
 
                 final Dialog dialog = new Dialog(MainActivity.this);
                 dialog.setContentView(R.layout.xl_dialog_upgrade);
@@ -82,8 +82,8 @@ public class MainActivity extends Activity implements View.OnClickListener,Updat
                     public void onClick(View v) {
                         Toast.makeText(MainActivity.this, "click confirm", Toast.LENGTH_SHORT).show();
                         //确认按钮
-                        if (updateService != null) {
-                            updateService.handleDownload();
+                        if (UpdateUtilsService != null) {
+                            UpdateUtilsService.handleDownload();
                         }
                         if (cancel) {
                             dialog.dismiss();
@@ -100,30 +100,30 @@ public class MainActivity extends Activity implements View.OnClickListener,Updat
                         }
                     }
                 });
-                updateService.setCustomUpdateDialog(dialog);
-                updateService.setDownloadListener(MainActivity.this);
-                updateService.start(intent);
+                UpdateUtilsService.setCustomUpdateDialog(dialog);
+                UpdateUtilsService.setDownloadListener(MainActivity.this);
+                UpdateUtilsService.start(intent);
 
                 break;
             case R.id.btn2:
 
-//                Intent intent = new Intent(MainActivity.this,UpdateService.class);
-//                intent.putExtra(UpdateService.S_SIZE, "34M");
-//                intent.putExtra(UpdateService.S_VERSION, "1.2.0");
-//                intent.putExtra(UpdateService.S_CONTENT,"1.增加更多功能;\n2.修复若干bug;\n3.界面优化;");
-//                intent.putExtra(UpdateService.S_CANCEL,false);
-//                intent.putExtra(UpdateService.S_DOWNLOADURL,downloadUrl);
-//                intent.putExtra(UpdateService.S_SAVEFILEPATH,saveFilePath);
+//                Intent intent = new Intent(MainActivity.this,UpdateUtilsService.class);
+//                intent.putExtra(UpdateUtilsService.S_SIZE, "34M");
+//                intent.putExtra(UpdateUtilsService.S_VERSION, "1.2.0");
+//                intent.putExtra(UpdateUtilsService.S_CONTENT,"1.增加更多功能;\n2.修复若干bug;\n3.界面优化;");
+//                intent.putExtra(UpdateUtilsService.S_CANCEL,false);
+//                intent.putExtra(UpdateUtilsService.S_DOWNLOADURL,downloadUrl);
+//                intent.putExtra(UpdateUtilsService.S_SAVEFILEPATH,saveFilePath);
 //                startService(intent);
                 cancel = false;
                 Intent intent1 = new Intent();
-                intent1.putExtra(UpdateService.S_SIZE, "34M");
-                intent1.putExtra(UpdateService.S_VERSION, "1.2.0");
-                intent1.putExtra(UpdateService.S_CONTENT,"1.增加更多功能;\n2.修复若干bug;\n3.界面优化;");
-                intent1.putExtra(UpdateService.S_CANCEL,cancel);
-                intent1.putExtra(UpdateService.S_DOWNLOADURL,downloadUrl);
-                intent1.putExtra(UpdateService.S_SAVEFILEPATH, saveFilePath);
-                updateService.start(intent1);
+                intent1.putExtra(UpdateUtilsService.S_SIZE, "34M");
+                intent1.putExtra(UpdateUtilsService.S_VERSION, "1.2.0");
+                intent1.putExtra(UpdateUtilsService.S_CONTENT,"1.增加更多功能;\n2.修复若干bug;\n3.界面优化;");
+                intent1.putExtra(UpdateUtilsService.S_CANCEL,cancel);
+                intent1.putExtra(UpdateUtilsService.S_DOWNLOADURL,downloadUrl);
+                intent1.putExtra(UpdateUtilsService.S_SAVEFILEPATH, saveFilePath);
+                UpdateUtilsService.start(intent1);
                 break;
         }
     }
