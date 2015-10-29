@@ -37,7 +37,7 @@ import xilinch.cc.org.appupdate.multdownload.SubDownloadThread;
  * @modifier xilinch 2015/10/19.
  * @description
  */
-public class UpdateUtils implements SubDownloadThread.ErrorListener{
+public class UpdateUtil implements SubDownloadThread.ErrorListener{
     private Context context;
 
     /**
@@ -180,7 +180,7 @@ public class UpdateUtils implements SubDownloadThread.ErrorListener{
         }
     };
 
-    public UpdateUtils(Context context){
+    public UpdateUtil(Context context){
         this.context = context;
 //        this.downloadUrl = downloadUrl;
 //        this.saveFilePath = saveFilePath;
@@ -351,7 +351,7 @@ public class UpdateUtils implements SubDownloadThread.ErrorListener{
                                 printi("start download");
                                 SubDownloadThread subDownloadThread = new SubDownloadThread(i,startIndex,endIndex
                                         ,text,filePath);
-                                subDownloadThread.setErrorListener(UpdateUtils.this);
+                                subDownloadThread.setErrorListener(UpdateUtil.this);
                                 subDownloadThread.start();
                             }
                         }
