@@ -5,15 +5,13 @@ import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,7 +37,7 @@ import xilinch.cc.org.appupdate.multdownload.SubDownloadThread;
  * @modifier xilinch 2015/10/19.
  * @description
  */
-public class UpdateUtilsService extends Service implements SubDownloadThread.ErrorListener{
+public class UpdateUtils implements SubDownloadThread.ErrorListener{
     private Context context;
 
     /**
@@ -107,6 +105,11 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
      */
     private DownloadListener downloadListener;
 
+
+    private DialogInterface.OnDismissListener onDismissListener;
+
+    private int notificationDrawableId = R.mipmap.ic_launcher;
+    private String notificationDrawableText = "开始下载";
     private Notification notification;
     private NotificationManager notificationManager;
 
@@ -121,11 +124,14 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
     public static final String S_SIZE = "S_SIZE";
     public static final String S_CANCEL = "S_CANCEL";
     public static final String S_CACHE_DIRECTORY = "qlk";
-
+    public static final String S_NOTIFICATIONDRAWABLEID = "notificationDrawableId";
+    public static final String S_NOTIFICATIONDRAWABLETEXT = "notificationDrawableText";
 
     public static final int MSG_RENEW = 0;
     public static final int MSG_ERROR = 1;
     public static final int MSG_SECONDPROCESS = 3;
+
+
     private Handler handler = new Handler() {
         boolean isError = false;
         int anima_process = 0;
@@ -174,7 +180,7 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
         }
     };
 
-    public UpdateUtilsService(Context context){
+    public UpdateUtils(Context context){
         this.context = context;
 //        this.downloadUrl = downloadUrl;
 //        this.saveFilePath = saveFilePath;
@@ -201,7 +207,7 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
     public void setCustomUpdateDialog(Dialog dialog){
         if(dialog != null ){
             this.customUpgradeDialog = dialog;
-            this.dialogCallBack = dialogCallBack;
+
         } else{
             //do nothing
         }
@@ -226,6 +232,11 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
             this.downloadListener = downloadListener;
         }
     }
+    public void setOnDismissListener(DialogInterface.OnDismissListener onDismissListener){
+        if(onDismissListener != null){
+            this.onDismissListener = onDismissListener;
+        }
+    }
 
 
 
@@ -233,20 +244,6 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
         handlerIntent(intent);
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-//        return super.onStartCommand(intent, flags, startId);
-
-        handlerIntent(intent);
-        //服务如果被杀掉，则系统重启服务
-        return START_REDELIVER_INTENT;
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 
     private void handlerIntent(Intent intent){
         if(intent != null){
@@ -257,6 +254,11 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
             this.content = intent.getStringExtra(S_CONTENT);
             this.version = intent.getStringExtra(S_VERSION);
             this.size = intent.getStringExtra(S_SIZE);
+            this.notificationDrawableId = intent.getIntExtra(S_NOTIFICATIONDRAWABLEID, notificationDrawableId);
+            String text = intent.getStringExtra(S_NOTIFICATIONDRAWABLETEXT);
+            if(TextUtils.isEmpty(text)){
+                this.notificationDrawableText = text;
+            }
             this.defaultThreadCount = intent.getIntExtra(S_DEFAULTTHREADCOUNT, defaultThreadCount);
 
             if(TextUtils.isEmpty(saveFilePath)){
@@ -349,7 +351,7 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
                                 printi("start download");
                                 SubDownloadThread subDownloadThread = new SubDownloadThread(i,startIndex,endIndex
                                         ,text,filePath);
-                                subDownloadThread.setErrorListener(UpdateUtilsService.this);
+                                subDownloadThread.setErrorListener(UpdateUtils.this);
                                 subDownloadThread.start();
                             }
                         }
@@ -390,17 +392,12 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
         stopService();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-    }
 
     /**
      * 停止服务、以及释放内存
      */
     public void stopService(){
-        stopSelf();
+
         //释放内存
 //        context = null;
 //        notificationManager = null;
@@ -419,14 +416,15 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(uri);
-        startActivity(intent);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     private void initNotification() {
 
         notificationManager = (NotificationManager) context.getSystemService(Activity.NOTIFICATION_SERVICE);
-        notification = new Notification(R.mipmap.ic_launcher, "开始下载", NOTIFICATION_ID);
-        notification.icon = R.mipmap.ic_launcher;
+        notification = new Notification(notificationDrawableId, notificationDrawableText, NOTIFICATION_ID);
+        notification.icon = notificationDrawableId;
         notification.contentView = new RemoteViews(context.getPackageName(), R.layout.xl_remoteview_notification);
         PendingIntent pendingIntent = PendingIntent.getActivity(context,0,new Intent(),PendingIntent.FLAG_UPDATE_CURRENT);
         notification.contentIntent = pendingIntent;
@@ -487,6 +485,9 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
             }
             confirm.setText("立即更新");
             defaultUpgradeDialog.setCancelable(canCancel);
+            if(onDismissListener != null){
+                defaultUpgradeDialog.setOnDismissListener(this.onDismissListener);
+            }
             if (canCancel) {
                 cancle.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -499,8 +500,9 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
                     @Override
                     public void onClick(View v) {
                         defaultUpgradeDialog.dismiss();
-                        //TODO 终结所有activity
+                        //终结所有activity
 //                    finishAllActivity();
+
                     }
                 });
             }
@@ -513,7 +515,7 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
 
                 }
             });
-            defaultUpgradeDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
+//            defaultUpgradeDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
             defaultUpgradeDialog.show();
         } else {
 
@@ -549,7 +551,7 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
                                 dialogCallBack.cancle();
                             }
                             customUpgradeDialog.dismiss();
-                            //TODO 终结所有activity
+                            //终结所有activity
 //                    finishAllActivity();
                         }
                     });
@@ -570,7 +572,7 @@ public class UpdateUtilsService extends Service implements SubDownloadThread.Err
                 });
             }
 
-            customUpgradeDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
+//            customUpgradeDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
             customUpgradeDialog.show();
 
         }
