@@ -2,6 +2,7 @@ package xilinch.cc.org.appupdate;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,11 +17,11 @@ import android.widget.Toast;
  * @version 1.0
  * @description
  */
-public class MainActivity extends Activity implements View.OnClickListener,UpdateUtils.DownloadListener{
+public class MainActivity extends Activity implements View.OnClickListener, xilinch.cc.org.appupdate.UpdateUtil.DownloadListener{
 
     Button btn1,btn2;
     EditText et;
-    UpdateUtils UpdateUtil;
+    xilinch.cc.org.appupdate.UpdateUtil UpdateUtil;
     boolean cancel = false;
     public static final String CACHE_DIRECTORY = "qlk";
 
@@ -52,7 +53,7 @@ public class MainActivity extends Activity implements View.OnClickListener,Updat
     public void onClick(View v) {
         String downloadUrl = et.getText().toString();
         String saveFilePath = getSaveFile();
-        UpdateUtil = new UpdateUtils(MainActivity.this);
+        UpdateUtil = new UpdateUtil(MainActivity.this);
 
         switch (v.getId()){
             case R.id.btn1:
@@ -65,35 +66,44 @@ public class MainActivity extends Activity implements View.OnClickListener,Updat
                 intent.putExtra(UpdateUtil.S_CANCEL,cancel);
                 intent.putExtra(UpdateUtil.S_DOWNLOADURL,downloadUrl);
                 intent.putExtra(UpdateUtil.S_SAVEFILEPATH, saveFilePath);
-                UpdateUtil = new UpdateUtils(MainActivity.this);
+                intent.putExtra(UpdateUtil.S_NOTIFICATIONDRAWABLEID, R.mipmap.d_upgrade_ic);
+                intent.putExtra(UpdateUtil.S_NOTIFICATIONDRAWABLETEXT, "开始下载");
+                UpdateUtil = new UpdateUtil(MainActivity.this);
+                UpdateUtil.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        //强制升级，关闭应用程序,可选升级自己做逻辑出处理
 
-                final Dialog dialog = new Dialog(MainActivity.this);
-                dialog.setContentView(R.layout.xl_dialog_upgrade);
-                dialog.findViewById(R.id.xc_id_dialog_query_confirm).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(MainActivity.this, "click confirm", Toast.LENGTH_SHORT).show();
-                        //确认按钮
-                        if (UpdateUtil != null) {
-                            UpdateUtil.handleDownload();
-                        }
-                        if (cancel) {
-                            dialog.dismiss();
-                        }
                     }
                 });
-                dialog.findViewById(R.id.xc_id_dialog_query_cancle).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(MainActivity.this, "click cancel", Toast.LENGTH_SHORT).show();
-                        //取消按钮
-                        if(cancel){
-                            dialog.dismiss();
-                        }
-                    }
-                });
-                UpdateUtil.setCustomUpdateDialog(dialog);
-                UpdateUtil.setDownloadListener(MainActivity.this);
+
+//                final Dialog dialog = new Dialog(MainActivity.this);
+//                dialog.setContentView(R.layout.xl_dialog_upgrade);
+//                dialog.findViewById(R.id.xc_id_dialog_query_confirm).setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Toast.makeText(MainActivity.this, "click confirm", Toast.LENGTH_SHORT).show();
+//                        //确认按钮
+//                        if (UpdateUtil != null) {
+//                            UpdateUtil.handleDownload();
+//                        }
+//                        if (cancel) {
+//                            dialog.dismiss();
+//                        }
+//                    }
+//                });
+//                dialog.findViewById(R.id.xc_id_dialog_query_cancle).setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Toast.makeText(MainActivity.this, "click cancel", Toast.LENGTH_SHORT).show();
+//                        //取消按钮
+//                        if(cancel){
+//                            dialog.dismiss();
+//                        }
+//                    }
+//                });
+//                UpdateUtil.setCustomUpdateDialog(dialog);
+//                UpdateUtil.setDownloadListener(MainActivity.this);
                 UpdateUtil.start(intent);
 
                 break;
@@ -107,6 +117,14 @@ public class MainActivity extends Activity implements View.OnClickListener,Updat
                 intent1.putExtra(UpdateUtil.S_CANCEL,cancel);
                 intent1.putExtra(UpdateUtil.S_DOWNLOADURL,downloadUrl);
                 intent1.putExtra(UpdateUtil.S_SAVEFILEPATH, saveFilePath);
+                intent1.putExtra(UpdateUtil.S_NOTIFICATIONDRAWABLEID, R.mipmap.d_upgrade_ic);
+                intent1.putExtra(UpdateUtil.S_NOTIFICATIONDRAWABLETEXT, "开始下载");
+                UpdateUtil.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        //强制升级，关闭应用程序,可选升级自己做逻辑出处理
+                    }
+                });
                 UpdateUtil.start(intent1);
                 break;
         }
