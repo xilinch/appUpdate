@@ -116,7 +116,7 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
-            <xilinch.cc.org.appupdate.CustomProgressWithPercentView
+            <xilinch.cc.upgradelib.CustomProgressWithPercentView
                 android:visibility="gone"
                 android:id="@+id/xc_id_dialog_fl_percent"
                 android:layout_width="match_parent"
@@ -124,7 +124,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp">
 
-            </xilinch.cc.org.appupdate.CustomProgressWithPercentView>
+            </xilinch.cc.upgradelib.CustomProgressWithPercentView>
         </FrameLayout>
     </LinearLayout>
 

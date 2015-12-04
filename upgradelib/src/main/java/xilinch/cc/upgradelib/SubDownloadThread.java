@@ -1,21 +1,12 @@
-package xilinch.cc.org.appupdate.multdownload;
+package xilinch.cc.upgradelib;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
-import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import xilinch.cc.org.appupdate.R;
 
 
 /**
@@ -32,6 +23,7 @@ public class SubDownloadThread extends Thread {
     private int threadId;
 
     private ErrorListener errorListener;
+    private static final int S_buffer_size = 1 * 1024;
 
 
     public SubDownloadThread(int threadId, long startIndex, long endIndex, String url, String saveFilePath) {
@@ -66,12 +58,12 @@ public class SubDownloadThread extends Thread {
                 File saveFile = new File(saveFilePath);
                 randomAccessFile.seek(startIndex);
                 InputStream inputStream = httpURLConnection.getInputStream();
-                byte[] buffer = new byte[1 * 1024];
-                int len = 0;
+                byte[] buffer = new byte[S_buffer_size];
+                int len ;
                 while ((len = inputStream.read(buffer)) != -1) {
 
                     randomAccessFile.write(buffer, 0, len);
-                    long fileLength = saveFile.length();
+//                    long fileLength = saveFile.length();
 
                 }
                 inputStream.close();
@@ -86,8 +78,6 @@ public class SubDownloadThread extends Thread {
             if(errorListener != null){
                 errorListener.onError();
             }
-        } finally {
-
         }
 
     }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/c_white_ffffff"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/xl_update_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="说明:强制升级弹出框不可取消，可选升级弹出框可以取消。升级动作配置为多线程下载。"
+        />
+
+    <Button
+        android:layout_marginTop="10dp"
+        android:text="强制升级"
+        android:id="@+id/xl_btn_forceUpdate"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+
+    <Button
+        android:layout_marginTop="10dp"
+        android:text="可选升级"
+        android:id="@+id/xl_btn_normalUpdate"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+</LinearLayout>

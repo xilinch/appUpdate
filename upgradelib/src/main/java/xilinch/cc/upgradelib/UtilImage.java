@@ -1,4 +1,4 @@
-package xilinch.cc.org.appupdate;
+package xilinch.cc.upgradelib;
 
 import android.content.Context;
 

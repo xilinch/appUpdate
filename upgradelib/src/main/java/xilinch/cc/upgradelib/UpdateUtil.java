@@ -1,4 +1,4 @@
-package xilinch.cc.org.appupdate;
+package xilinch.cc.upgradelib;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -29,17 +29,16 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLConnection;
 
-import xilinch.cc.org.appupdate.multdownload.SubDownloadThread;
-
 /**
  * @author xilinch on 2015/10/19.
  * @version 1.2.0
  * @modifier xilinch 2015/10/19.
  * @description
  */
-public class UpdateUtil implements SubDownloadThread.ErrorListener{
+public class UpdateUtil implements SubDownloadThread.ErrorListener {
     private Context context;
 
+    private boolean isUpgrading = false;
     /**
      * http://www.baidu.com/zz.apk
      */
@@ -168,6 +167,7 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
                     }
                     isError = true;
                     shortToast("网络连接错误,下载失败!");
+                    isUpgrading = false;
                     break;
                 case MSG_SECONDPROCESS:
 
@@ -182,8 +182,6 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
 
     public UpdateUtil(Context context){
         this.context = context;
-//        this.downloadUrl = downloadUrl;
-//        this.saveFilePath = saveFilePath;
     }
 
     public void setDefaultThreadCount (int defaultThreadCount){
@@ -240,8 +238,13 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
 
 
 
-    public void start(Intent intent) {
-        handlerIntent(intent);
+    public synchronized void start(Intent intent) {
+            if (!isUpgrading) {
+
+                handlerIntent(intent);
+            } else {
+                Toast.makeText(context, "您当前正在升级中!", Toast.LENGTH_SHORT).show();
+            }
     }
 
 
@@ -275,7 +278,6 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
                 shortToast("程序下载链接错误!");
             }
 
-
         }
     }
 
@@ -303,6 +305,7 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
                 boolean success = createFile(downloadUrl);
                 //创建成功以后进入下载
                 if(success ){
+                    isUpgrading = true;
                     startDownload();
                 } else{
                     shortToast("文件创建失败");
@@ -354,16 +357,27 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
                                 subDownloadThread.setErrorListener(UpdateUtil.this);
                                 subDownloadThread.start();
                             }
+                            //进度更新
+                            Message msg = handler.obtainMessage();
+                            msg.what = MSG_RENEW;
+                            handler.sendMessage(msg);
+                            printi("send MSG_RENEW");
+                        } else{
+                            context.getMainLooper().prepare();
+                            Message msg_error = handler.obtainMessage();
+                            msg_error.what = MSG_ERROR;
+                            handler.sendMessage(msg_error);
                         }
 
-                        //进度更新
-                        Message msg = handler.obtainMessage();
-                        msg.what = MSG_RENEW;
-                        handler.sendMessage(msg);
-                        printi("send MSG_RENEW");
+
                     } catch(Exception e) {
                         String msg = e.getMessage();
                         System.out.println(msg);
+                        context.getMainLooper().prepare();
+                        Message msg_error = handler.obtainMessage();
+                        msg_error.what = MSG_ERROR;
+                        handler.sendMessage(msg_error);
+
                     } finally{
 
                     }
@@ -381,23 +395,24 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
             downloadListener.onError( S_ERROR_CODE );
 
         }
+        notification.contentView.setTextViewText(R.id.xl_remoteview_percent, "下载失败");
         //下载失败，
         if(handler != null){
             Message msg = handler.obtainMessage();
             msg.what = MSG_ERROR;
             handler.sendMessage(msg);
         }
-        notification.contentView.setTextViewText(R.id.xl_remoteview_percent, "下载失败");
+        isUpgrading = false;
         //停止服务、以及释放内存
-        stopService();
+        release();
     }
 
 
     /**
      * 停止服务、以及释放内存
      */
-    public void stopService(){
-
+    public void release(){
+        isUpgrading = false;
         //释放内存
 //        context = null;
 //        notificationManager = null;
@@ -426,7 +441,7 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
         notification = new Notification(notificationDrawableId, notificationDrawableText, NOTIFICATION_ID);
         notification.icon = notificationDrawableId;
         notification.contentView = new RemoteViews(context.getPackageName(), R.layout.xl_remoteview_notification);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context,0,new Intent(),PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, new Intent(), PendingIntent.FLAG_UPDATE_CURRENT);
         notification.contentIntent = pendingIntent;
 
         notification.contentView.setProgressBar(R.id.xl_remoteview_progress_percent, 100, 0, false);
@@ -619,8 +634,9 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
                 Message message = handler.obtainMessage();
                 message.what = MSG_RENEW;
                 //延时一秒更新
-                handler.sendMessageDelayed(message, 500);
+                handler.sendMessageDelayed(message, 400);
             } else if(percent == 100){
+
                 if(customUpgradeDialog != null){
                     customUpgradeDialog.dismiss();
                 } else if(defaultUpgradeDialog != null){
@@ -631,7 +647,7 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
                 notificationManager.notify(NOTIFICATION_ID, notification);
 
                 //停止服务、以及释放内存
-                stopService();
+                release();
             }
         }
     }
@@ -651,17 +667,23 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
     }
 
     private void installlApk(){
-        //准备拼接新的文件名（保存在存储卡后的文件名）
-        String newFilename = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
-        //      String newFilename = "dbyz";
+        if(downloadUrl != null){
 
-        newFilename = saveFilePath + File.separator + newFilename;
-        //进入安装
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(newFilename)),
-                "application/vnd.android.package-archive");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+            //准备拼接新的文件名（保存在存储卡后的文件名）
+            String newFilename = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
+            //      String newFilename = "dbyz";
+
+            newFilename = saveFilePath + File.separator + newFilename;
+            //进入安装
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.fromFile(new File(newFilename)),
+                    "application/vnd.android.package-archive");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if(context != null){
+
+                context.startActivity(intent);
+            }
+        }
     }
 
     private boolean createFile(String urlStr){
@@ -703,6 +725,7 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
         String appFile = Environment.getExternalStorageDirectory().getAbsolutePath() + System.getProperty("file.separator") +
                 S_CACHE_DIRECTORY + "/apk";
         newFilename = appFile + File.separator + newFilename;
+        newFilename = appFile + File.separator + "test.apk";
         return newFilename;
     }
 
@@ -717,7 +740,7 @@ public class UpdateUtil implements SubDownloadThread.ErrorListener{
     }
 
     private void shortToast(String msg){
-        Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
 

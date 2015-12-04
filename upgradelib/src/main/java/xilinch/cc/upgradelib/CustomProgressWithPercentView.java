@@ -1,4 +1,4 @@
-package xilinch.cc.org.appupdate;
+package xilinch.cc.upgradelib;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -63,7 +63,7 @@ public class CustomProgressWithPercentView extends FrameLayout {
         progressBar.setMax(MAX);
         progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.dd_color_progressbar));
         LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                UtilImage.dip2px(context,40));
+                UtilImage.dip2px(context, 40));
         addView(progressBar,layoutParams);
 
         tv_percent = new TextView(context);

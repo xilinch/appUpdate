@@ -1,63 +1,47 @@
 package xilinch.cc.org.appupdate;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import xilinch.cc.upgradelib.UpdateUtil;
 
 /**
  * @author xilinch on 2015/10/8.
  * @version 1.0
  * @description
  */
-public class MainActivity extends Activity implements View.OnClickListener, xilinch.cc.org.appupdate.UpdateUtil.DownloadListener{
+public class MainActivity extends Activity {
 
-    Button btn1,btn2;
-    EditText et;
-    xilinch.cc.org.appupdate.UpdateUtil UpdateUtil;
-    boolean cancel = false;
-    public static final String CACHE_DIRECTORY = "qlk";
+    private Button xl_btn_normalUpdate,xl_btn_forceUpdate;
+    private UpdateUtil UpdateUtil;
+    private boolean cancel = false;
+    private static final String CACHE_DIRECTORY = "qlk";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_update);
+        initWidgets();
+        listeners();
 
-        findViews();
-        initListener();
     }
 
-    private void findViews(){
-        btn1 = (Button) findViewById(R.id.btn1);
-        btn2 = (Button) findViewById(R.id.btn2);
-        et = (EditText) findViewById(R.id.xl_et_url);
+    public void initWidgets() {
+        xl_btn_normalUpdate =  (Button) findViewById(R.id.xl_btn_normalUpdate);
+        xl_btn_forceUpdate =  (Button) findViewById(R.id.xl_btn_forceUpdate);
     }
 
-    private void initListener(){
-        btn1.setOnClickListener(this);
-        btn2.setOnClickListener(this);
-    }
-
-    /**
-     * Called when a view has been clicked.
-     * @param v The view that was clicked.
-     */
-    @Override
-    public void onClick(View v) {
-        String downloadUrl = et.getText().toString();
-        String saveFilePath = getSaveFile();
-        UpdateUtil = new UpdateUtil(MainActivity.this);
-
-        switch (v.getId()){
-            case R.id.btn1:
-
+    public void listeners() {
+        final String downloadUrl = "http://dl.37wan.cn/upload/1_1001655_10004/guailixingbaiwanyasewang_10004.apk";
+        final String saveFilePath = getSaveFile();
+        UpdateUtil = new UpdateUtil(this);
+        xl_btn_normalUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 cancel = true;
                 Intent intent = new Intent();
                 intent.putExtra(UpdateUtil.S_SIZE, "34M");
@@ -68,7 +52,6 @@ public class MainActivity extends Activity implements View.OnClickListener, xili
                 intent.putExtra(UpdateUtil.S_SAVEFILEPATH, saveFilePath);
                 intent.putExtra(UpdateUtil.S_NOTIFICATIONDRAWABLEID, R.mipmap.d_upgrade_ic);
                 intent.putExtra(UpdateUtil.S_NOTIFICATIONDRAWABLETEXT, "开始下载");
-                UpdateUtil = new UpdateUtil(MainActivity.this);
                 UpdateUtil.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
@@ -105,17 +88,19 @@ public class MainActivity extends Activity implements View.OnClickListener, xili
 //                UpdateUtil.setCustomUpdateDialog(dialog);
 //                UpdateUtil.setDownloadListener(MainActivity.this);
                 UpdateUtil.start(intent);
+            }
+        });
 
-                break;
-            case R.id.btn2:
-
+        xl_btn_forceUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 cancel = false;
                 Intent intent1 = new Intent();
                 intent1.putExtra(UpdateUtil.S_SIZE, "34M");
                 intent1.putExtra(UpdateUtil.S_VERSION, "1.2.0");
-                intent1.putExtra(UpdateUtil.S_CONTENT,"1.增加更多功能;\n2.修复若干bug;\n3.界面优化;");
-                intent1.putExtra(UpdateUtil.S_CANCEL,cancel);
-                intent1.putExtra(UpdateUtil.S_DOWNLOADURL,downloadUrl);
+                intent1.putExtra(UpdateUtil.S_CONTENT, "1.增加更多功能;\n2.修复若干bug;\n3.界面优化;");
+                intent1.putExtra(UpdateUtil.S_CANCEL, cancel);
+                intent1.putExtra(UpdateUtil.S_DOWNLOADURL, downloadUrl);
                 intent1.putExtra(UpdateUtil.S_SAVEFILEPATH, saveFilePath);
                 intent1.putExtra(UpdateUtil.S_NOTIFICATIONDRAWABLEID, R.mipmap.d_upgrade_ic);
                 intent1.putExtra(UpdateUtil.S_NOTIFICATIONDRAWABLETEXT, "开始下载");
@@ -126,18 +111,8 @@ public class MainActivity extends Activity implements View.OnClickListener, xili
                     }
                 });
                 UpdateUtil.start(intent1);
-                break;
-        }
-    }
-
-    @Override
-    public void onProgress(int progress) {
-        Log.i("my","onProgress:" + progress);
-    }
-
-    @Override
-    public void onError(int errorCode) {
-        Log.i("my","onError:" + errorCode);
+            }
+        });
     }
 
     private String getSaveFile(){
@@ -145,6 +120,5 @@ public class MainActivity extends Activity implements View.OnClickListener, xili
         return Environment.getExternalStorageDirectory().getAbsolutePath() + System.getProperty("file.separator") +
                 CACHE_DIRECTORY + "/apk";
     }
-
 
 }
